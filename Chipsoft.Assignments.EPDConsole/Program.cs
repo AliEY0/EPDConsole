@@ -12,85 +12,91 @@ namespace Chipsoft.Assignments.EPDConsole;
 
 public class Program
 {
-    private static readonly CultureInfo[] SupportedCultures =
-    [
-        new("nl-NL"),
-        CultureInfo.InvariantCulture
-    ];
-
     private static readonly ServiceProvider ServiceProvider = BuildServices();
-
-    public static async Task Main(string[] args)
-    {
-        ExecuteWithScope<DatabaseInitializer>(databaseInitializer => databaseInitializer.EnsureCreated());
-
-        while (await ShowMenuAsync())
-        {
-        }
-    }
 
     private static ServiceProvider BuildServices()
     {
         var services = new ServiceCollection();
 
-        services.AddDbContext<EPDDbContext>(options => options.UseSqlite("Data Source=epd.db"));
+        services.AddDbContext<EPDDbContext>(options =>
+            options.UseSqlite("Data Source=epd.db"));
+
         services.RegisterEpdRepositories();
         services.RegisterBusinessServices();
 
         return services.BuildServiceProvider();
     }
 
-    private static async Task<bool> ShowMenuAsync()
+    static void Main(string[] args)
     {
-        Console.Clear();
-        PrintLogo();
+        ExecuteWithScope<DatabaseInitializer>(db => db.EnsureCreated());
+        ShowMenu();
 
-        Console.WriteLine();
-        Console.WriteLine("1 - Patient toevoegen");
-        Console.WriteLine("2 - Patienten verwijderen");
-        Console.WriteLine("3 - Arts toevoegen");
-        Console.WriteLine("4 - Arts verwijderen");
-        Console.WriteLine("5 - Afspraak toevoegen");
-        Console.WriteLine("6 - Afspraken inzien");
-        Console.WriteLine("7 - Sluiten");
-        Console.WriteLine("8 - Reset db");
+        ServiceProvider.Dispose();
+    }
 
-        if (!int.TryParse(Console.ReadLine(), out var option))
-            return true;
+    public static void ShowMenu()
+    {
+        bool doorgaan = true;
 
-        switch (option)
+        while (doorgaan)
         {
-            case 1:
-                await ExecuteCommandAsync(AddPatientAsync);
-                return true;
-            case 2:
-                await ExecuteCommandAsync(DeletePatientAsync);
-                return true;
-            case 3:
-                await ExecuteCommandAsync(AddDoctorAsync);
-                return true;
-            case 4:
-                await ExecuteCommandAsync(DeleteDoctorAsync);
-                return true;
-            case 5:
-                await ExecuteCommandAsync(AddAppointmentAsync);
-                return true;
-            case 6:
-                await ExecuteCommandAsync(ShowAppointmentsAsync);
-                return true;
-            case 7:
-                return false;
-            case 8:
-                ExecuteCommand(ResetDatabase);
-                return true;
-            default:
-                return true;
+            Console.Clear();
+
+            if (File.Exists("logo.txt"))
+            {
+                foreach (var line in File.ReadAllLines("logo.txt"))
+                    Console.WriteLine(line);
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("1 - Patient toevoegen");
+            Console.WriteLine("2 - Patienten verwijderen");
+            Console.WriteLine("3 - Arts toevoegen");
+            Console.WriteLine("4 - Arts verwijderen");
+            Console.WriteLine("5 - Afspraak toevoegen");
+            Console.WriteLine("6 - Afspraken inzien");
+            Console.WriteLine("7 - Sluiten");
+            Console.WriteLine("8 - Reset db");
+
+            if (int.TryParse(Console.ReadLine(), out int option))
+            {
+                switch (option)
+                {
+                    case 1:
+                        AddPatient();
+                        break;
+                    case 2:
+                        DeletePatient();
+                        break;
+                    case 3:
+                        AddPhysician();
+                        break;
+                    case 4:
+                        DeletePhysician();
+                        break;
+                    case 5:
+                        AddAppointment();
+                        break;
+                    case 6:
+                        ShowAppointment();
+                        break;
+                    case 7:
+                        doorgaan = false;
+                        break;
+                    case 8:
+                        ExecuteWithScope<DatabaseInitializer>(db => db.Reset());
+                        ShowMessage("Database is opnieuw aangemaakt.");
+                        break;
+                }
+            }
         }
     }
 
-    private static async Task AddPatientAsync()
+    private static void AddPatient()
     {
-        ShowHeader("Patient toevoegen");
+        Console.Clear();
+        Console.WriteLine("Patient toevoegen");
 
         var patient = new Patient
         {
@@ -98,34 +104,43 @@ public class Program
             Address = ReadRequiredText("Adres: "),
             PhoneNumber = ReadRequiredText("Telefoonnummer: "),
             Email = ReadRequiredText("E-mail: "),
-            DateOfBirth = ReadDate("Geboortedatum (bijv. 26-04-2026): ").Date
+            DateOfBirth = ReadDate("Geboortedatum (bijv. 25-04-1990): ").Date
         };
 
-        await ExecuteWithScopeAsync<PatientService>(patientService => patientService.AddAsync(patient));
+        ExecuteWithScope<PatientService>(service =>
+            service.AddAsync(patient).GetAwaiter().GetResult());
+
         ShowMessage("Patient toegevoegd.");
     }
 
-    private static async Task DeletePatientAsync()
+    private static void DeletePatient()
     {
-        ShowHeader("Patient verwijderen");
+        Console.Clear();
+        Console.WriteLine("Patient verwijderen");
 
-        var patients = await ExecuteWithScopeAsync<PatientService, IReadOnlyList<Patient>>(patientService => patientService.GetAllAsync());
-        if (!EnsureItemsAvailable(patients, "Er zijn geen patienten om te verwijderen."))
+        var patients = ExecuteWithScope<PatientService, IReadOnlyList<Patient>>(service =>
+            service.GetAllAsync().GetAwaiter().GetResult());
+
+        if (patients.Count == 0)
+        {
+            ShowMessage("Er zijn geen patienten om te verwijderen.");
             return;
+        }
 
-        PrintOptions("Patienten", patients, patient => patient.Id, patient => patient.Name);
+        PrintPatients(patients);
 
-        var patient = SelectById(patients, "Kies het ID van de patient: ", currentPatient => currentPatient.Id);
-        if (patient is null)
-            throw new InvalidOperationException("Patient niet gevonden.");
+        int id = ReadInt("Kies het ID van de patient: ");
 
-        await ExecuteWithScopeAsync<PatientService>(patientService => patientService.DeleteAsync(patient.Id));
+        ExecuteWithScope<PatientService>(service =>
+            service.DeleteAsync(id).GetAwaiter().GetResult());
+
         ShowMessage("Patient verwijderd.");
     }
 
-    private static async Task AddDoctorAsync()
+    private static void AddPhysician()
     {
-        ShowHeader("Arts toevoegen");
+        Console.Clear();
+        Console.WriteLine("Arts toevoegen");
 
         var doctor = new Doctor
         {
@@ -133,67 +148,107 @@ public class Program
             Address = ReadRequiredText("Adres: ")
         };
 
-        await ExecuteWithScopeAsync<DoctorService>(doctorService => doctorService.AddAsync(doctor));
+        ExecuteWithScope<DoctorService>(service =>
+            service.AddAsync(doctor).GetAwaiter().GetResult());
+
         ShowMessage("Arts toegevoegd.");
     }
 
-    private static async Task DeleteDoctorAsync()
+    private static void DeletePhysician()
     {
-        ShowHeader("Arts verwijderen");
+        Console.Clear();
+        Console.WriteLine("Arts verwijderen");
 
-        var doctors = await ExecuteWithScopeAsync<DoctorService, IReadOnlyList<Doctor>>(doctorService => doctorService.GetAllAsync());
-        if (!EnsureItemsAvailable(doctors, "Er zijn geen artsen om te verwijderen."))
+        var doctors = ExecuteWithScope<DoctorService, IReadOnlyList<Doctor>>(service =>
+            service.GetAllAsync().GetAwaiter().GetResult());
+
+        if (doctors.Count == 0)
+        {
+            ShowMessage("Er zijn geen artsen om te verwijderen.");
             return;
+        }
 
-        PrintOptions("Artsen", doctors, doctor => doctor.Id, doctor => doctor.Name);
+        PrintDoctors(doctors);
 
-        var doctor = SelectById(doctors, "Kies het ID van de arts: ", currentDoctor => currentDoctor.Id);
-        if (doctor is null)
-            throw new InvalidOperationException("Arts niet gevonden.");
+        int id = ReadInt("Kies het ID van de arts: ");
 
-        await ExecuteWithScopeAsync<DoctorService>(doctorService => doctorService.DeleteAsync(doctor.Id));
+        ExecuteWithScope<DoctorService>(service =>
+            service.DeleteAsync(id).GetAwaiter().GetResult());
+
         ShowMessage("Arts verwijderd.");
     }
 
-    private static async Task AddAppointmentAsync()
+    private static void AddAppointment()
     {
-        ShowHeader("Afspraak toevoegen");
+        Console.Clear();
+        Console.WriteLine("Afspraak toevoegen");
 
-        var patients = await ExecuteWithScopeAsync<PatientService, IReadOnlyList<Patient>>(patientService => patientService.GetAllAsync());
-        if (!EnsureItemsAvailable(patients, "Voeg eerst minimaal een patient toe."))
+        var patients = ExecuteWithScope<PatientService, IReadOnlyList<Patient>>(service =>
+            service.GetAllAsync().GetAwaiter().GetResult());
+
+        var doctors = ExecuteWithScope<DoctorService, IReadOnlyList<Doctor>>(service =>
+            service.GetAllAsync().GetAwaiter().GetResult());
+
+        if (patients.Count == 0)
+        {
+            ShowMessage("Voeg eerst minimaal een patient toe.");
             return;
+        }
 
-        var doctors = await ExecuteWithScopeAsync<DoctorService, IReadOnlyList<Doctor>>(doctorService => doctorService.GetAllAsync());
-        if (!EnsureItemsAvailable(doctors, "Voeg eerst minimaal een arts toe."))
+        if (doctors.Count == 0)
+        {
+            ShowMessage("Voeg eerst minimaal een arts toe.");
             return;
+        }
 
-        PrintOptions("Patienten", patients, patient => patient.Id, patient => patient.Name);
-        PrintOptions("Artsen", doctors, doctor => doctor.Id, doctor => doctor.Name);
+        PrintPatients(patients);
+        int patientId = ReadInt("Kies het ID van de patient: ");
 
-        var patient = SelectById(patients, "Kies het ID van de patient: ", currentPatient => currentPatient.Id);
-        var doctor = SelectById(doctors, "Kies het ID van de arts: ", currentDoctor => currentDoctor.Id);
-
-        if (patient is null || doctor is null)
-            throw new InvalidOperationException("Ongeldige patient of arts geselecteerd.");
+        PrintDoctors(doctors);
+        int doctorId = ReadInt("Kies het ID van de arts: ");
 
         var appointment = new Appointment
         {
-            PatientId = patient.Id,
-            DoctorId = doctor.Id,
-            Date = ReadDate("Datum en tijd (bijv. 27-04-2026 14:30): ")
+            PatientId = patientId,
+            DoctorId = doctorId,
+            Date = ReadDate("Datum en tijd (bijv. 25-04-2026 14:30): ")
         };
 
-        await ExecuteWithScopeAsync<AppointmentService>(appointmentService => appointmentService.AddAsync(appointment));
-        ShowMessage("Afspraak toegevoegd.");
+        try
+        {
+            ExecuteWithScope<AppointmentService>(service =>
+                service.AddAsync(appointment).GetAwaiter().GetResult());
+
+            ShowMessage("Afspraak toegevoegd.");
+        }
+        catch (ValidationException ex)
+        {
+            foreach (var error in ex.Errors)
+            {
+                Console.WriteLine(error.ErrorMessage);
+            }
+
+            WaitForUser();
+        }
+        catch (Exception ex)
+        {
+            ShowMessage($"Er ging iets mis: {ex.Message}");
+        }
     }
 
-    private static async Task ShowAppointmentsAsync()
+    private static void ShowAppointment()
     {
-        ShowHeader("Afspraken");
+        Console.Clear();
+        Console.WriteLine("Afspraken");
 
-        var appointments = await ExecuteWithScopeAsync<AppointmentService, IReadOnlyList<AppointmentOverview>>(appointmentService => appointmentService.GetAllAsync());
-        if (!EnsureItemsAvailable(appointments, "Er zijn nog geen afspraken."))
+        var appointments = ExecuteWithScope<AppointmentService, IReadOnlyList<AppointmentOverview>>(service =>
+            service.GetAllAsync().GetAwaiter().GetResult());
+
+        if (appointments.Count == 0)
+        {
+            ShowMessage("Er zijn nog geen afspraken.");
             return;
+        }
 
         foreach (var appointment in appointments)
         {
@@ -204,146 +259,24 @@ public class Program
         WaitForUser();
     }
 
-    private static void ResetDatabase()
+    private static void PrintPatients(IEnumerable<Patient> patients)
     {
-        ExecuteWithScope<DatabaseInitializer>(databaseInitializer => databaseInitializer.Reset());
-        ShowMessage("Database is opnieuw aangemaakt.");
-    }
+        Console.WriteLine("Patienten:");
 
-    private static async Task ExecuteCommandAsync(Func<Task> action)
-    {
-        try
-        {
-            await action();
-        }
-        catch (ValidationException validationException)
-        {
-            ShowValidationErrors(validationException);
-        }
-        catch (DbUpdateException)
-        {
-            ShowMessage("Er ging iets mis bij het opslaan in de database.");
-        }
-        catch (InvalidOperationException invalidOperationException)
-        {
-            ShowMessage(invalidOperationException.Message);
-        }
-    }
-
-    private static void ExecuteCommand(Action action)
-    {
-        try
-        {
-            action();
-        }
-        catch (DbUpdateException)
-        {
-            ShowMessage("Er ging iets mis bij het opslaan in de database.");
-        }
-        catch (InvalidOperationException invalidOperationException)
-        {
-            ShowMessage(invalidOperationException.Message);
-        }
-    }
-    private static void ExecuteWithScope<TService>(Action<TService> action)
-        where TService : notnull
-    {
-        using var scope = ServiceProvider.CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<TService>();
-        action(service);
-    }
-
-    private static async Task<T> ExecuteWithScopeAsync<TService, T>(Func<TService, Task<T>> action)
-        where TService : notnull
-    {
-        using var scope = ServiceProvider.CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<TService>();
-        return await action(service);
-    }
-
-    private static async Task ExecuteWithScopeAsync<TService>(Func<TService, Task> action)
-        where TService : notnull
-    {
-        using var scope = ServiceProvider.CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<TService>();
-        await action(service);
-    }
-
-    private static void PrintLogo()
-    {
-        if (!File.Exists("logo.txt"))
-            return;
-
-        foreach (var line in File.ReadAllLines("logo.txt"))
-            Console.WriteLine(line);
-    }
-
-    private static void ShowHeader(string title)
-    {
-        Console.Clear();
-        Console.WriteLine(title);
-        Console.WriteLine();
-    }
-
-    private static void PrintOptions<T>(
-        string title,
-        IEnumerable<T> items,
-        Func<T, int> getId,
-        Func<T, string> displayText)
-    {
-        Console.WriteLine(title + ":");
-
-        foreach (var item in items)
-            Console.WriteLine($"{getId(item)} - {displayText(item)}");
+        foreach (var patient in patients)
+            Console.WriteLine($"{patient.Id} - {patient.Name}");
 
         Console.WriteLine();
     }
 
-    private static T? SelectById<T>(IEnumerable<T> items, string prompt, Func<T, int> getId)
-        where T : class
+    private static void PrintDoctors(IEnumerable<Doctor> doctors)
     {
-        var id = ReadInt(prompt);
-        return items.FirstOrDefault(item => getId(item) == id);
-    }
+        Console.WriteLine("Artsen:");
 
-    private static bool EnsureItemsAvailable<T>(IReadOnlyCollection<T> items, string message)
-    {
-        if (items.Count > 0)
-            return true;
+        foreach (var doctor in doctors)
+            Console.WriteLine($"{doctor.Id} - {doctor.Name}");
 
-        ShowMessage(message);
-        return false;
-    }
-
-    private static void ShowValidationErrors(ValidationException validationException)
-    {
-        foreach (var error in validationException.Errors)
-            Console.WriteLine(error.ErrorMessage);
-
-        WaitForUser();
-    }
-
-    private static void ShowMessage(string message)
-    {
-        Console.WriteLine(message);
-        WaitForUser();
-    }
-
-    private static DateTime ReadDate(string prompt)
-    {
-        while (true)
-        {
-            Console.Write(prompt);
-            var input = Console.ReadLine();
-
-            foreach (var culture in SupportedCultures)
-            {
-                if (DateTime.TryParse(input, culture, DateTimeStyles.AllowWhiteSpaces, out var result))
-                    return result;
-            }
-
-            Console.WriteLine("Voer een geldige datum in, bijvoorbeeld 25-04-2026 14:30.");
-        }
+        Console.WriteLine();
     }
 
     private static string ReadRequiredText(string prompt)
@@ -366,11 +299,52 @@ public class Program
         {
             Console.Write(prompt);
 
-            if (int.TryParse(Console.ReadLine(), out var value) && value > 0)
+            if (int.TryParse(Console.ReadLine(), out int value) && value > 0)
                 return value;
 
             Console.WriteLine("Voer een geldig positief nummer in.");
         }
+    }
+
+    private static DateTime ReadDate(string prompt)
+    {
+        while (true)
+        {
+            Console.Write(prompt);
+
+            if (DateTime.TryParse(
+                    Console.ReadLine(),
+                    new CultureInfo("nl-NL"),
+                    DateTimeStyles.AllowWhiteSpaces,
+                    out DateTime date))
+            {
+                return date;
+            }
+
+            Console.WriteLine("Voer een geldige datum in, bijvoorbeeld 25-04-2026 14:30.");
+        }
+    }
+
+    private static T ExecuteWithScope<TService, T>(Func<TService, T> action)
+        where TService : notnull
+    {
+        using var scope = ServiceProvider.CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<TService>();
+        return action(service);
+    }
+
+    private static void ExecuteWithScope<TService>(Action<TService> action)
+        where TService : notnull
+    {
+        using var scope = ServiceProvider.CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<TService>();
+        action(service);
+    }
+
+    private static void ShowMessage(string message)
+    {
+        Console.WriteLine(message);
+        WaitForUser();
     }
 
     private static void WaitForUser()
