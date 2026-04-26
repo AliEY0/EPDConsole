@@ -13,5 +13,5 @@ public class EPDDbContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseSqlite($"Data Source=epd.db");
 
-    public DbSet<Patient> Patients { get; set; }
+    //public DbSet<Patient> Patients { get; set; }
 }
