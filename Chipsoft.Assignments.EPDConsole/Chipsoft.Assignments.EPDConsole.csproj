@@ -8,7 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Application\Chipsoft.Assignments.Application.Business\Chipsoft.Assignments.Application.Business.csproj" />
+    <ProjectReference Include="..\Application\Chipsoft.Assignments.Application.Contracts\Chipsoft.Assignments.Application.Contracts.csproj" />
+    <ProjectReference Include="..\Infrastructure\Chipsoft.Assignments.Infrastructure.DataAccess\Chipsoft.Assignments.Infrastructure.DataAccess.csproj" />
   </ItemGroup>
 
   <ItemGroup>

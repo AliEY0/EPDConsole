@@ -10,7 +10,7 @@ namespace Chipsoft.Assignments.Application.Business.Validators
     {
         public AppointmentValidator()
         {
-            RuleFor(appointment => appointment.ScheduledAt).NotEmpty();
+            RuleFor(appointment => appointment.Date).NotEmpty();
             RuleFor(appointment => appointment.PatientId).GreaterThan(0);
             RuleFor(appointment => appointment.DoctorId).GreaterThan(0);
         }

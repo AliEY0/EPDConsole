@@ -1,9 +1,27 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.3.32819.101
+# Visual Studio Version 18
+VisualStudioVersion = 18.5.11716.220 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chipsoft.Assignments.EPDConsole", "Chipsoft.Assignments.EPDConsole\Chipsoft.Assignments.EPDConsole.csproj", "{C3E36DFE-5F45-40C4-BCF8-CEACF7987B54}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{5FF5D0EA-98F8-44BA-960E-F13AAFDC3306}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application", "{4CF5A205-32AF-4015-ABFE-C6094681FAC5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{5A8402B1-01A2-42F6-97B3-6BD001999ADA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chipsoft.Assignments.Core.Domain", "Core\Chipsoft.Assignments.Core.Domain\Chipsoft.Assignments.Core.Domain.csproj", "{BF7146FA-944E-479B-B434-FA05281A8D83}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chipsoft.Assignments.Application.Business", "Application\Chipsoft.Assignments.Application.Business\Chipsoft.Assignments.Application.Business.csproj", "{0D5B2863-94B9-4189-A45B-B9987BA7F7A7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chipsoft.Assignments.Application.Contracts", "Application\Chipsoft.Assignments.Application.Contracts\Chipsoft.Assignments.Application.Contracts.csproj", "{B5793534-FB93-424E-8185-02FBB085E0C6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chipsoft.Assignments.Infrastructure", "Infrastructure\Chipsoft.Assignments.Infrastructure\Chipsoft.Assignments.Infrastructure.csproj", "{0563A15C-E8F7-479B-8759-DE473586FAE7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chipsoft.Assignments.Infrastructure.DataAccess", "Infrastructure\Chipsoft.Assignments.Infrastructure.DataAccess\Chipsoft.Assignments.Infrastructure.DataAccess.csproj", "{4FFDDCE6-94D0-405D-93BD-A8705C12A2AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chipsoft.Assignments.Tests", "Chipsoft.Assignments.Tests\Chipsoft.Assignments.Tests.csproj", "{726982E5-D00B-44A7-ACC6-BA61876EE45A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +33,40 @@ Global
 		{C3E36DFE-5F45-40C4-BCF8-CEACF7987B54}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C3E36DFE-5F45-40C4-BCF8-CEACF7987B54}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C3E36DFE-5F45-40C4-BCF8-CEACF7987B54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF7146FA-944E-479B-B434-FA05281A8D83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF7146FA-944E-479B-B434-FA05281A8D83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF7146FA-944E-479B-B434-FA05281A8D83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF7146FA-944E-479B-B434-FA05281A8D83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D5B2863-94B9-4189-A45B-B9987BA7F7A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D5B2863-94B9-4189-A45B-B9987BA7F7A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D5B2863-94B9-4189-A45B-B9987BA7F7A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D5B2863-94B9-4189-A45B-B9987BA7F7A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5793534-FB93-424E-8185-02FBB085E0C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5793534-FB93-424E-8185-02FBB085E0C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5793534-FB93-424E-8185-02FBB085E0C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5793534-FB93-424E-8185-02FBB085E0C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0563A15C-E8F7-479B-8759-DE473586FAE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0563A15C-E8F7-479B-8759-DE473586FAE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0563A15C-E8F7-479B-8759-DE473586FAE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0563A15C-E8F7-479B-8759-DE473586FAE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FFDDCE6-94D0-405D-93BD-A8705C12A2AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FFDDCE6-94D0-405D-93BD-A8705C12A2AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FFDDCE6-94D0-405D-93BD-A8705C12A2AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FFDDCE6-94D0-405D-93BD-A8705C12A2AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{726982E5-D00B-44A7-ACC6-BA61876EE45A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{726982E5-D00B-44A7-ACC6-BA61876EE45A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{726982E5-D00B-44A7-ACC6-BA61876EE45A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{726982E5-D00B-44A7-ACC6-BA61876EE45A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{BF7146FA-944E-479B-B434-FA05281A8D83} = {5FF5D0EA-98F8-44BA-960E-F13AAFDC3306}
+		{0D5B2863-94B9-4189-A45B-B9987BA7F7A7} = {4CF5A205-32AF-4015-ABFE-C6094681FAC5}
+		{B5793534-FB93-424E-8185-02FBB085E0C6} = {4CF5A205-32AF-4015-ABFE-C6094681FAC5}
+		{0563A15C-E8F7-479B-8759-DE473586FAE7} = {5A8402B1-01A2-42F6-97B3-6BD001999ADA}
+		{4FFDDCE6-94D0-405D-93BD-A8705C12A2AB} = {5A8402B1-01A2-42F6-97B3-6BD001999ADA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4DC831ED-E6E9-4CB5-A190-1D884564F3AE}

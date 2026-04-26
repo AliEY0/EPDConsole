@@ -1,4 +1,6 @@
-﻿namespace Chipsoft.Assignments.EPDConsole;
+﻿using Chipsoft.Assignments.Infrastructure.DataAccess.Configuration;
+
+namespace Chipsoft.Assignments.EPDConsole;
 
 public class Program
 {

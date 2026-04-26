@@ -6,4 +6,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="12.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Chipsoft.Assignments.Application.Contracts\Chipsoft.Assignments.Application.Contracts.csproj" />
+  </ItemGroup>
+
 </Project>

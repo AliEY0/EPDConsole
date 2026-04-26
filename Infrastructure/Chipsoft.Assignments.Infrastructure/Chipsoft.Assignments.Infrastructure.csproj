@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Application\Chipsoft.Assignments.Application.Contracts\Chipsoft.Assignments.Application.Contracts.csproj" />
+  </ItemGroup>
+
 </Project>
