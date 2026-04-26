@@ -78,3 +78,9 @@ De tests richten zich op de businesslaag, zoals:
 - aanmaken van geldige en ongeldige afspraken
 
 De tests in `Chipsoft.Assignments.Tests` zijn AI-generated en daarna opgenomen in het project als extra verificatie van de businessregels.
+
+## AI-gebruik
+
+Voor de backend (domeinmodellen, businesslogica, repositories en architectuur) is geen AI gebruikt. Deze onderdelen zijn volledig handmatig ontworpen en geïmplementeerd.
+AI is enkel als hulpmiddel gebruikt bij de opzet van de console-interface in `Program.cs`, en bij het genereren van een deel van de tests. Deze code is vervolgens handmatig gecontroleerd en waar nodig aangepast.
+Ik begrijp de volledige codebase en kan alle gemaakte keuzes en implementaties toelichten. Mocht iets onduidelijk zijn, dan beantwoord ik daar graag vragen over.
