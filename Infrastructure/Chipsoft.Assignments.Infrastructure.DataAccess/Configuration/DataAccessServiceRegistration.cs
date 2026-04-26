@@ -7,11 +7,13 @@ namespace Chipsoft.Assignments.Infrastructure.DataAccess.Configuration
 {
     public static class DataAccessServiceRegistration
     {
-        public static void RegisterEpdRepositories(this IServiceCollection services)
+        public static IServiceCollection RegisterEpdRepositories(this IServiceCollection services)
         {
             services.AddScoped<IPatientRepository, PatientRepository>();
-            //services.AddScoped<IDoctorRepository, DoctorRepository>();
-            //services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+            services.AddScoped<IDoctorRepository, DoctorRepository>();
+            services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+            services.AddScoped<DatabaseInitializer>();
+            return services;
         }
     }
 }

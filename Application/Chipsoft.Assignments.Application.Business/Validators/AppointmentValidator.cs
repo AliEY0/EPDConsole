@@ -10,7 +10,10 @@ namespace Chipsoft.Assignments.Application.Business.Validators
     {
         public AppointmentValidator()
         {
-            RuleFor(appointment => appointment.Date).NotEmpty();
+            RuleFor(appointment => appointment.Date)
+                .NotEmpty()
+                .Must(date => date > DateTime.Now)
+                .WithMessage("Een afspraak mag niet in het verleden liggen.");
             RuleFor(appointment => appointment.PatientId).GreaterThan(0);
             RuleFor(appointment => appointment.DoctorId).GreaterThan(0);
         }

@@ -15,6 +15,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Application\Chipsoft.Assignments.Application.Business\Chipsoft.Assignments.Application.Business.csproj" />
+    <ProjectReference Include="..\Application\Chipsoft.Assignments.Application.Contracts\Chipsoft.Assignments.Application.Contracts.csproj" />
+    <ProjectReference Include="..\Core\Chipsoft.Assignments.Core.Domain\Chipsoft.Assignments.Core.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 
