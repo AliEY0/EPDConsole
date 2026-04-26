@@ -13,7 +13,6 @@ namespace Chipsoft.Assignments.Core.Domain
         public required string PhoneNumber { get; set; }
         public required string Email { get; set; }
         public required DateTime DateOfBirth { get; set; }
-
         public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
     }
 }
